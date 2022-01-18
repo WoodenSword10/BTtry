@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">BluetoothTry</string>
+    <string name="is_sopport_bluetooth">is_support_BT</string>
+    <string name="is_open_bluetooth">is_open_BT</string>
+    <string name="turn_on_bluetooth">turn_on_BT</string>
+    <string name="turn_off_bluetooth">turn_off_BT</string>
+</resources>
