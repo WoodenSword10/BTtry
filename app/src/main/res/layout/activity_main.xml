@@ -53,29 +53,18 @@
         android:orientation="vertical"
         app:layout_constraintGuide_begin="205dp" />
 
+
     <EditText
         android:id="@+id/editTextTextPersonName2"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_width="413dp"
+        android:layout_height="54dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="visible equipment"
         android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button8" />
-
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#2196F3"
-        android:onClick="refresh_BT"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextTextPersonName2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button9"
-        app:srcCompat="@android:drawable/ic_popup_sync" />
+        app:layout_constraintTop_toBottomOf="@+id/button9" />
 
     <ListView
         android:id="@+id/listView"
@@ -90,19 +79,29 @@
         android:id="@+id/button8"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:onClick="make_Visible"
         android:text="MAKE_VISUBLE"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3"
-        android:onClick="make_Visible"/>
+        app:layout_constraintTop_toBottomOf="@+id/button3" />
 
     <Button
         android:id="@+id/button9"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="CONNECT"
+        android:onClick="connect_BT"
+        android:text="Seek_Device"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button8" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Bonded_Device"
+        android:onClick="refresh_BT"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/button4"
-        android:onClick="connect_BT"/>
+        app:layout_constraintStart_toEndOf="@+id/button9"
+        app:layout_constraintTop_toBottomOf="@+id/button8" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Set;
 public class BlueToothController {
     // 成员变量
     private BluetoothAdapter mAdapter;
+    private String TAG = "";
 
     /**
      * 构造函数
@@ -80,9 +82,14 @@ public class BlueToothController {
     /**
      * 查找设备
      */
-    public void findDevice(){
+    public boolean findDevice(){
         assert(mAdapter!=null);
-        mAdapter.startDiscovery();
+        if(mAdapter.isDiscovering()){
+            mAdapter.cancelDiscovery();
+            return false;
+        }else {
+            return mAdapter.startDiscovery();
+        }
     }
 
     /**
@@ -93,4 +100,7 @@ public class BlueToothController {
         return new ArrayList<BluetoothDevice>(mAdapter.getBondedDevices());
     }
 
+    public BluetoothDevice find_device(String addr){
+        return mAdapter.getRemoteDevice(addr);
+    }
 }
