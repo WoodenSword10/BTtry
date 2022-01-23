@@ -3,21 +3,25 @@ package com.example.bttry;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * 蓝牙适配器
  */
 public class BlueToothController {
     // 成员变量
+    private BluetoothSocket btSocket;
     private BluetoothAdapter mAdapter;
     private String TAG = "";
+    public static final int RECV_VIEW = 0;
+    public static final int NOTICE_VIEW = 1;
 
     /**
      * 构造函数
@@ -100,7 +104,48 @@ public class BlueToothController {
         return new ArrayList<BluetoothDevice>(mAdapter.getBondedDevices());
     }
 
+    /**
+     * 发现设备
+     * @param addr
+     * @return
+     */
     public BluetoothDevice find_device(String addr){
         return mAdapter.getRemoteDevice(addr);
+    }
+
+    /**
+     * 连接设备
+     */
+    public void connect_init(BluetoothDevice device){
+        mAdapter.cancelDiscovery();
+        try{
+            Method clientMethod = device.getClass().getMethod("createRfcommSocketToServiceRecord", new Class[]{int.class});
+            btSocket = (BluetoothSocket)clientMethod.invoke(device, 1);
+            connect(btSocket);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void connect(final BluetoothSocket btSocket){
+        try {
+            if (btSocket.isConnected()){
+                Log.e(TAG, "connect: 已经连接");
+                return;
+            }
+            btSocket.connect();
+            if (btSocket.isConnected()){
+                Log.e(TAG, "connect: 连接成功");
+            }else{
+                Log.e(TAG, "connect: 连接失败");
+                btSocket.close();
+
+            }
+        }catch (Exception e){e.printStackTrace();}
+    }
+
+    public void cancelSearch() {
+        mAdapter.cancelDiscovery();
     }
 }

@@ -6,26 +6,33 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    public ArrayList<String> requestList = new ArrayList<>();
     public boolean isOver = false;
     public ArrayAdapter adapter1;
     // 常量
@@ -34,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private BlueToothController mController = new BlueToothController();
     // 延时创建Toast类，
     private Toast mToast;
-    // 请求列表
-    private ArrayList<String> requestList = new ArrayList<>();
     //定义一个列表，存蓝牙设备的地址。
     public ArrayList<String> arrayList=new ArrayList<>();
     //定义一个列表，存蓝牙设备地址，用于显示。
@@ -49,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     // 消息
     private String TAG = "";
     private IntentFilter foundFilter;
+    private BluetoothSocket bluetoothSocket;
+//    private BTclient bTclient = new BTclient();
     //  广播
     private BroadcastReceiver receiver = new BroadcastReceiver(){
 
@@ -105,34 +112,45 @@ public class MainActivity extends AppCompatActivity {
                 BluetoothDevice device = mController.find_device(rightStr);
 //                Log.e(TAG, "onItemClick: " + device.getName());
                 if (device.getBondState() == 10) {
-                    device.createBond();
+                    mController.cancelSearch();
                     String s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未配对"  + "\n";
                     deviceName.remove(s);
+                    device.createBond();
                     s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：已配对"  + "\n";
                     deviceName.add(s);
                     adapter1.notifyDataSetChanged();
                     showToast("配对：" + device.getName());
                 }
                 else{
-                    unpairDevice(device);
-                    String s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n";
-                    String s2 = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：已配对"  + "\n";
-                    if(deviceName.contains(s)) {
-                        deviceName.remove(s);
-                        adapter1.notifyDataSetChanged();
+//                    String s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n";
+                    mController.cancelSearch();
+                    String s2 = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：已配对" + "\n";
+                    if(deviceName.contains(s2)) {
+//                        bTclient.connectDevice(device);
+//                        bTclient.start();
+                        Intent intent = new Intent(MainActivity.this, BTReadAndWrite.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("deviceAddr", device.getAddress());
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        finish();
                     }
-                    else if(deviceName.contains(s2)){
-                        deviceName.remove(s2);
-                        s2 = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未配对"  + "\n";
-                        deviceName.add(s2);
-                        adapter1.notifyDataSetChanged();
-                    }
-                    showToast("取消配对：" + device.getName());
+//                    if(deviceName.contains(s2)){
+//                        unpairDevice(device);
+//                        deviceName.remove(s2);
+//                        s2 = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未配对"  +"\n";
+//                        deviceName.add(s2);
+//                        adapter1.notifyDataSetChanged();
+//                        showToast("取消配对：" + device.getName());
+//                    }
                 }
             }
         });
     }
 
+    /**
+     * 查找设备广播
+     */
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -142,12 +160,12 @@ public class MainActivity extends AppCompatActivity {
 //                Log.e(TAG, "onReceive: 发现新设备");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device.getBondState() == 12) {
-                    s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：已配对"  + "\n";
+                    s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：已配对" + "\n";
                 }
                 else if (device.getBondState() == 10){
-                    s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未配对"  + "\n";
+                    s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未配对" +"\n";
                 }else{
-                    s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未知"  + "\n";
+                    s = "设备名：" + device.getName() + "\n" + "设备地址：" + device.getAddress() + "\n" + "连接状态：未知" + "\n";
                 }
                 if (!deviceName.contains(s)) {
                     deviceName.add(s);//将搜索到的蓝牙名称和地址添加到列表。
@@ -219,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
             requestList.add(Manifest.permission.BLUETOOTH_CONNECT);
             requestList.add(Manifest.permission.ACCESS_FINE_LOCATION);
             requestList.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+            requestList.add(Manifest.permission.BLUETOOTH);
         }
         if(requestList.size() != 0){
             ActivityCompat.requestPermissions(this, requestList.toArray(new String[0]), REQ_PERMISSION_CODE);
